@@ -28,7 +28,8 @@
                         </div>
                         <div class="col">
                             <h5>Duration:</h5>
-                            <p>@string.Format("{0} hours {1} minutes", (int)walk.Duration.TotalHours, walk.Duration.Minutes)</p>
+                            <p>@string.Format("{0} {1}", (int)walk.Duration.TotalHours >= 1 ? $"{(int)walk.Duration.TotalHours} hours" : 
+                                "", walk.Duration.Minutes > 0 ? $"{walk.Duration.Minutes} minutes" : "")</p>
                         </div>
                         <div class="col">
                             <h5>Distance Traveled:</h5>
@@ -53,8 +54,7 @@
                         class="btn btn-primary photo-button"
                         data-bs-toggle="modal"
                         data-bs-target="#walk-modal"
-                        data-id="@walk.Id"
-                        
+                        data-id="@walk.Id"                        
                     >
                         View Photos
                     </button>
@@ -72,7 +72,7 @@
     aria-labelledby="exampleModalLabel"
     aria-hidden="true"
 >
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">New walk</h5>
@@ -81,7 +81,9 @@
                     class="close"
                     data-bs-dismiss="modal"
                     aria-label="Close"
-                ></button>
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form
@@ -95,22 +97,31 @@
                         <input type="date" class="form-control" id="date" name="date" />
                     </div>
                     <div class="form-group">
-                        <label for="temperature">Air Temperature</label>
+                        <label for="temperature">Air Temperature (in degrees Celsius)</label>
                         <input
                             type="number"
+                            min="-100"
+                            max="60"
                             class="form-control"
                             id="temperature"
                             name="temperature"
                         />
                     </div>
                     <div class="form-group">
-                        <label for="duration">Duration</label>
-                        <input type="text" class="form-control" id="duration" name="duration"/>
+                        <label for="duration">Duration (in minutes)</label>
+                        <input 
+                            type="number" 
+                            min="0"
+                            class="form-control" 
+                            id="duration" 
+                            name="duration"/>
                     </div>
                     <div class="form-group">
-                        <label for="distance">Distance Traveled</label>
+                        <label for="distance">Distance Traveled (in kilometers)</label>
                         <input
                             type="number"
+                            min="0"
+                            step="0.1"
                             class="form-control"
                             id="distance"
                             name="distance"
@@ -121,6 +132,7 @@
                         <select class="form-control" id="walk-type" name="walk-type">
                             <option value="urban">Urban</option>
                             <option value="forest">Forest</option>
+                            <option value="forest">Urban-Forest</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -159,8 +171,8 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="walk-modal-label">Walk on the Beach - Photos</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="walk-modal-label">Photos from the walk</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -168,7 +180,7 @@
                 <!-- Photos will be loaded dynamically here -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

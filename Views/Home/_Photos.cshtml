@@ -1,12 +1,13 @@
 @model List<WalkPhoto>
 
-<div id="walk-carousel" class="carousel slide" data-ride="carousel">
-    <ol class="carousel-indicators">
+<div id="walk-carousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
         @for (var i = 0; i < Model.Count(); i++)
         {
-            <li data-target="#walk-carousel" data-slide-to="@i"></li>
+            //<li data-target="#walk-carousel" data-slide-to="@i"></li>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : "")" aria-label="Slide 1"></button>
         }
-    </ol>
+    </div>
     <div class="carousel-inner">
         @for (var i = 0; i < Model.Count(); i++)
         {
@@ -15,12 +16,13 @@
             </div>
         }
     </div>
-    <a class="carousel-control-prev" href="#walk-carousel" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-    <a class="carousel-control-next" href="#walk-carousel" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
     </a>
 </div>
