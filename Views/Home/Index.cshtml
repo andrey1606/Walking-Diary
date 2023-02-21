@@ -1,0 +1,176 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model List<Walk>
+
+
+<div class="container">
+    <p>Welcome, @User.Identity.Name!</p>
+    <button
+        type="button"
+        class="btn btn-primary my-3"
+        data-bs-toggle="modal"
+        data-bs-target="#exampleModal"
+    >
+        Add new walk
+    </button>
+
+    <h1 class="walks-list-title">My Walks</h1>
+    <div class="walks-list">
+        @foreach (var walk in Model)
+        {
+            <div class="card walk-card" id="@walk.Id">
+                <div class="container card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h5>Date:</h5>
+                            <p>@walk.Date.ToShortDateString()</p>
+                        </div>
+                        <div class="col">
+                            <h5>Duration:</h5>
+                            <p>@string.Format("{0} hours {1} minutes", (int)walk.Duration.TotalHours, walk.Duration.Minutes)</p>
+                        </div>
+                        <div class="col">
+                            <h5>Distance Traveled:</h5>
+                            <p>@walk.Distance km</p>
+                        </div>
+                        <div class="col">
+                            <h5>Air Temperature:</h5>
+                            <p>@walk.AirTemperature &deg;C</p>
+                        </div>
+                        <div class="col">
+                            <h5>Type of Walk:</h5>
+                            <p>@walk.WalkType</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="container card-body">
+                    <p class="card-text">@walk.Comment</p>
+                </div>
+                <div class="container card-body">
+                    <button
+                        type="button"
+                        class="btn btn-primary photo-button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#walk-modal"
+                        data-id="@walk.Id"
+                        
+                    >
+                        View Photos
+                    </button>
+                </div>            
+            </div>
+        }        
+    </div>
+</div>
+
+<!-- Modal -->
+<div
+    class="modal fade"
+    id="exampleModal"
+    tabindex="-1"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New walk</h5>
+                <button
+                    type="button"
+                    class="close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <form
+                    name="addWalkForm"
+                    action="Home/AddWalk"
+                    method="post"
+                    enctype="multipart/form-data"
+                >
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="temperature">Air Temperature</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="temperature"
+                            name="temperature"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration</label>
+                        <input type="text" class="form-control" id="duration" name="duration"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="distance">Distance Traveled</label>
+                        <input
+                            type="number"
+                            class="form-control"
+                            id="distance"
+                            name="distance"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="walk-type">Type of Walk</label>
+                        <select class="form-control" id="walk-type" name="walk-type">
+                            <option value="urban">Urban</option>
+                            <option value="forest">Forest</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Comment</label>
+                        <textarea class="form-control" id="comment" name="comment"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="photos">Photos</label>
+                        <input
+                            type="file"
+                            class="form-control-file"
+                            id="photos"
+                            name="photos"
+                            multiple
+                        />
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Add
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="walk-modal" tabindex="-1" aria-labelledby="walk-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="walk-modal-label">Walk on the Beach - Photos</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Photos will be loaded dynamically here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
