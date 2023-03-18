@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home Page";    
 }
 @model List<Walk>
 
@@ -28,12 +28,27 @@
                         </div>
                         <div class="col">
                             <h5>Duration:</h5>
-                            <p>@string.Format("{0} {1}", (int)walk.Duration.TotalHours >= 1 ? $"{(int)walk.Duration.TotalHours} hours" : 
-                                "", walk.Duration.Minutes > 0 ? $"{walk.Duration.Minutes} minutes" : "")</p>
+                            @if (walk.Duration.HasValue)
+                            {
+                                <p>@(walk.Duration.Value.TotalMinutes < 60 ? $"{walk.Duration.Value.TotalMinutes} minutes"
+                                            : walk.Duration.Value.TotalMinutes % 60 == 0 ? $"{walk.Duration.Value.TotalHours} hours"
+                                            : $"{(int)walk.Duration.Value.TotalHours} hours {walk.Duration.Value.Minutes} minutes")</p>
+                            }
+                            else
+                            {
+                                <p>-</p>
+                            }
                         </div>
                         <div class="col">
                             <h5>Distance Traveled:</h5>
-                            <p>@walk.Distance km</p>
+                            @if (walk.Distance.HasValue)
+                            {
+                                <p>@walk.Distance km</p>
+                            }
+                            else
+                            {
+                                <p>-</p>
+                            }
                         </div>
                         <div class="col">
                             <h5>Air Temperature:</h5>
@@ -76,14 +91,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">New walk</h5>
-                <button
-                    type="button"
-                    class="close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                >
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form
@@ -92,20 +100,20 @@
                     method="post"
                     enctype="multipart/form-data"
                 >
+                                 
                     <div class="form-group">
                         <label for="date">Date</label>
                         <input type="date" class="form-control" id="date" name="date" />
                     </div>
                     <div class="form-group">
-                        <label for="temperature">Air Temperature (in degrees Celsius)</label>
+                        <label for="AirTemperature">Air Temperature (in degrees Celsius)</label>
                         <input
                             type="number"
                             min="-100"
                             max="60"
                             class="form-control"
-                            id="temperature"
-                            name="temperature"
-                        />
+                             id="AirTemperature"
+                            name="AirTemperature" />
                     </div>
                     <div class="form-group">
                         <label for="duration">Duration (in minutes)</label>
@@ -128,11 +136,11 @@
                         />
                     </div>
                     <div class="form-group">
-                        <label for="walk-type">Type of Walk</label>
-                        <select class="form-control" id="walk-type" name="walk-type">
+                        <label for="WalkType">Type of Walk</label>
+                        <select class="form-control" id="WalkType" name="WalkType">
                             <option value="urban">Urban</option>
                             <option value="forest">Forest</option>
-                            <option value="forest">Urban-Forest</option>
+                            <option value="urban-forest">Urban-Forest</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -172,9 +180,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="walk-modal-label">Photos from the walk</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Photos will be loaded dynamically here -->

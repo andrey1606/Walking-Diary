@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WalkingDiary.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace WalkingDiary.Controllers;
 
@@ -11,7 +12,6 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly WalkingDiaryDbContext _context;
     private readonly IWebHostEnvironment _env;
-
     public HomeController(WalkingDiaryDbContext context, IWebHostEnvironment env, ILogger<HomeController> logger)
     {
         _logger = logger;
@@ -27,44 +27,56 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddWalk()
+    public async Task<IActionResult> AddWalk( Walk walk)
     {
-        var date = DateOnly.Parse(Request.Form["date"]);
-        var temperature = int.Parse(Request.Form["temperature"]);
-        var duration = TimeSpan.FromMinutes(int.Parse(Request.Form["duration"]));
-        var distance = float.Parse(Request.Form["distance"]);
-        var walkType = Request.Form["walk-type"];
-        var comment = Request.Form["comment"];
+        walk.UserId = await GetCurrentUserId();        
+        walk.CreatedAt = DateTime.Now;
+        walk.UpdatedAt = DateTime.Now;
+        if (walk.Duration != null)
+            walk.Duration = TimeSpan.FromMinutes(int.Parse(Request.Form["duration"]));
 
-        var walk = new Walk
+        if (ModelState.IsValid)
         {
-            UserId = await GetCurrentUserId(),
-            Date = date,
-            AirTemperature = temperature,
-            Duration = duration,
-            Distance = distance,
-            WalkType = walkType,
-            Comment = comment,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
-
-        // Save the walk to the database
-        _context.Walks.Add(walk);
-        await _context.SaveChangesAsync();
-
-        // Upload the photos and save their URLs to the database
-        if (Request.Form.Files.Count > 0)
-        {
-            foreach (var file in Request.Form.Files)
+            // Check that either duration or distance is specified
+            if (walk.Duration == TimeSpan.Zero && walk.Distance <= 0)
             {
-                var photo = new WalkPhoto();
-                photo.WalkId = walk.Id;
-                photo.Url = await SavePhotoAsync(file);
-                photo.CreatedAt = DateTime.Now;
-                _context.WalkPhotos.Add(photo);
+                ModelState.AddModelError("", "Either duration or distance must be specified");
+                return View(walk);
             }
+
+            // Save the walk to the database
+            _context.Walks.Add(walk);
             await _context.SaveChangesAsync();
+
+            // Upload the photos and save their URLs to the database
+            if (Request.Form.Files.Count > 0)
+            {
+                foreach (var file in Request.Form.Files)
+                {
+                    var photo = new WalkPhoto();
+                    photo.WalkId = walk.Id;
+                    photo.Url = await SavePhotoAsync(file);
+                    photo.CreatedAt = DateTime.Now;
+                    _context.WalkPhotos.Add(photo);
+                }
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
+        }
+
+        // проходим по всем элементам в ModelState
+        foreach (var item in ModelState)
+        {
+            // если для определенного элемента имеются ошибки
+            if (item.Value.ValidationState == ModelValidationState.Invalid)
+            {
+                Console.WriteLine($"\nОшибки для свойства {item.Key}:\n");
+                // пробегаемся по всем ошибкам
+                foreach (var error in item.Value.Errors)
+                {
+                    Console.WriteLine($"{error.ErrorMessage}\n");
+                }
+            }
         }
         return RedirectToAction("Index");
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace WalkingDiary;
 
@@ -13,9 +14,11 @@ public partial class Walk
 
     public float AirTemperature { get; set; }
 
-    public TimeSpan Duration { get; set; }
+    [DurationOrDistanceRequired]
+    public TimeSpan? Duration { get; set; }
 
-    public float Distance { get; set; }
+    [DurationOrDistanceRequired]
+    public float? Distance { get; set; }
 
     public string WalkType { get; set; } = null!;
 
@@ -25,7 +28,31 @@ public partial class Walk
 
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public User? User { get; set; }
 
     public virtual ICollection<WalkPhoto> WalkPhotos { get; } = new List<WalkPhoto>();
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Duration == TimeSpan.Zero && Distance == 0)
+        {
+            yield return new ValidationResult("At least one of the fields 'Duration' or 'Distance' must be filled in.");
+        }
+    }
 }
+
+public class DurationOrDistanceRequiredAttribute : ValidationAttribute
+{
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    {
+        var walk = (Walk)validationContext.ObjectInstance;
+
+        if (walk.Duration == null && walk.Distance == null)
+        {
+            return new ValidationResult("Either Duration or Distance is required.");
+        }
+
+        return ValidationResult.Success;
+    }
+}
+

@@ -64,7 +64,7 @@ public partial class WalkingDiaryDbContext : DbContext
                 .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.WalkType)
-                .HasMaxLength(10)
+                .HasMaxLength(15)
                 .HasColumnName("walk_type");
 
             entity.HasOne(d => d.User).WithMany(p => p.Walks)
