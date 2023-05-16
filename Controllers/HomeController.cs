@@ -22,14 +22,17 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         var userId = await GetCurrentUserId();
-        var walks = await _context.Walks.Where(w => w.UserId == userId).ToListAsync<Walk>();
+        var walks = await _context.Walks
+            .Include(w => w.WalkPhotos)
+            .Where(w => w.UserId == userId)
+            .ToListAsync();
         return View(walks);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddWalk( Walk walk)
+    public async Task<IActionResult> AddWalk(Walk walk)
     {
-        walk.UserId = await GetCurrentUserId();        
+        walk.UserId = await GetCurrentUserId();
         walk.CreatedAt = DateTime.Now;
         walk.UpdatedAt = DateTime.Now;
         if (walk.Duration != null)
@@ -63,21 +66,7 @@ public class HomeController : Controller
             }
             return RedirectToAction("Index");
         }
-
-        // проходим по всем элементам в ModelState
-        foreach (var item in ModelState)
-        {
-            // если для определенного элемента имеются ошибки
-            if (item.Value.ValidationState == ModelValidationState.Invalid)
-            {
-                Console.WriteLine($"\nОшибки для свойства {item.Key}:\n");
-                // пробегаемся по всем ошибкам
-                foreach (var error in item.Value.Errors)
-                {
-                    Console.WriteLine($"{error.ErrorMessage}\n");
-                }
-            }
-        }
+        
         return RedirectToAction("Index");
     }
 

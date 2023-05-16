@@ -64,14 +64,19 @@
                     <p class="card-text">@walk.Comment</p>
                 </div>
                 <div class="container card-body">
-                    <button
-                        type="button"
-                        class="btn btn-primary photo-button"
+                    <button type="button"
+                        class="btn btn-primary photo-button @((walk.WalkPhotos.Count == 0) ? "disabled" : "")"
                         data-bs-toggle="modal"
                         data-bs-target="#walk-modal"
-                        data-id="@walk.Id"                        
-                    >
-                        View Photos
+                        data-id="@walk.Id">
+                        @if (walk.WalkPhotos.Count == 0)
+                        {
+                            <span>View Photos</span>
+                        }
+                        else
+                        {
+                            <span>View Photos (@walk.WalkPhotos.Count)</span>
+                        }
                     </button>
                 </div>            
             </div>
